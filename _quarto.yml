@@ -9,32 +9,32 @@ book:
   date: today
 
   chapters:
-    - index.qmd
+    - chapters/index.qmd
     - part: "Getting Started with Data"
       chapters:
-        - intro-data.qmd
-        - crime-rates.qmd
+        - chapters/intro-data.qmd
+        - chapters/crime-rates.qmd
     - part: "Understanding Distributions"
       chapters:
-        - sampling.qmd
-        - z-scores.qmd
+        - chapters/sampling.qmd
+        - chapters/z-scores.qmd
     - part: "Relationships Between Variables"
       chapters:
-        - correlation.qmd
-        - regression.qmd
-        - multiple-regression.qmd
+        - chapters/correlation.qmd
+        - chapters/regression.qmd
+        - chapters/multiple-regression.qmd
     - part: "Testing for Significance"
       chapters:
-        - significance.qmd
-        - anova.qmd
+        - chapters/significance.qmd
+        - chapters/anova.qmd
     - part: "Advanced Topics"
       chapters:
-        - weighting.qmd
+        - chapters/weighting.qmd
 
   navbar:
     left:
       - text: "Home"
-        href: index.qmd
+        href: chapters/index.qmd
     right:
       - icon: github
         href: https://github.com/dwillis/jour405_spring25
