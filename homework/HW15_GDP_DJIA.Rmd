@@ -1,5 +1,5 @@
 ---
-title: "HW8_GDP_DJIA"
+title: "HW15_GDP_DJIA"
 ---
 
 What is the relationship between the stock market, represented by the Dow Jones Industrial Average, or DJIA, and the Gross Domestic Product, a measure of the U.S. economic activity?

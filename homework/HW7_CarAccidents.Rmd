@@ -1,6 +1,5 @@
 ---
-title: "Finding Stories in Prince George's County Daily Accident Data"
-author: "YOUR NAME"
+title: "HW7_CarAccidents"
 ---
 
 ```{r setup, include=FALSE}

@@ -1,5 +1,5 @@
 ---
-title: "HW7_MandMs"
+title: "HW8_MandMs"
 ---
 
 In this assignment, you'll be picking up where you left off with the M&Ms activity. You'll load the data and perform some basic statistical analysis. Follow the steps below to complete the assignment.
