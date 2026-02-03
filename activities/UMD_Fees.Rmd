@@ -28,12 +28,35 @@ umd_fees_pct <- umd_fees |> mutate(pct_change = (`Fall 2024`- `Fall 2021`)/`Fall
 ```
 
 
+```{r}
+umd_fees_pct_ <- umd_fees |> mutate(pct_change = (`Fall 2025`- `Fall 2024`)/`Fall 2024` * 100)
+```
+
+
+```{r}
+comp <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/class_composition.csv")
+
+comp |>
+  summarize(
+    mean_first = mean(first_year),
+    mean_soph = mean(sophomore),
+    mean_junior = mean(junior),
+    mean_senior = mean(senior),
+    mean_grad = mean(grad)
+  )
+```
+
+
 
 ### Task 4: Describe our results
 
 Write a few sentences about what you found in the data. What's the story here?
 
+The most notable change in the data during the first round (fall 2024 vs fall 2021) was the drastic increase in student sustainability costs. There were increases for basically everything, but sustainability stood out. It raises questions about why this was such a drastic increase and what student sustainibility even is. Also, the second round of calculations (between fall 2025 and fall 2024) showed no percentage increase in sustainability. Why is the case for that year specifically? 
 
+```{r}
+The most notable change in the data during the first round (fall 2024 vs fall 2021) was the drastic increase in student sustainability costs. There were increases for basically everything, but sustainability stood out. It raises questions about why this was such a drastic increase and what student sustainibility even is. Also, the second round of calculations (between fall 2025 and fall 2024) showed no percentage increase in sustainability. Why is the case for that year specifically? 
+```
 
 
 
