@@ -55,7 +55,7 @@ Write a few sentences about what you found in the data. What's the story here?
 The most notable change in the data during the first round (fall 2024 vs fall 2021) was the drastic increase in student sustainability costs. There were increases for basically everything, but sustainability stood out. It raises questions about why this was such a drastic increase and what student sustainibility even is. Also, the second round of calculations (between fall 2025 and fall 2024) showed no percentage increase in sustainability. Why is the case for that year specifically? 
 
 ```{r}
-The most notable change in the data during the first round (fall 2024 vs fall 2021) was the drastic increase in student sustainability costs. There were increases for basically everything, but sustainability stood out. It raises questions about why this was such a drastic increase and what student sustainibility even is. Also, the second round of calculations (between fall 2025 and fall 2024) showed no percentage increase in sustainability. Why is the case for that year specifically? 
+The most notable change in the data during the first round (fall 2024 vs fall 2021) was the drastic increase in student sustainability costs. There were increases for basically everything, but sustainability stood out. It raises questions about why this was such a drastic increase and what student sustainibility even is. Also, the second round of calculations (between fall 2025 and fall 2024) showed no percentage increase in sustainability. Why is the case for that year specifically?
 ```
 
 
