@@ -45,7 +45,7 @@ crimes_with_rates <- crimes |> mutate(violent_rate = violent_crime_total/populat
 
 Write a few sentences about what you found in the data. What years had the highest crime rates? What years had the lowest crime rates? Does the pattern match your expectations?
 
-
+2020 had the lowest crimes of all by a pretty large amount. The late '80s and basically all of the '90s had the highest crime rates. After 2002, there was a big drop in crime and began steadily decreasing over time starting in 2006. I'm not particularly surprised by this data; the pandemic was during 2020, so there weren't many crimes that could be committed since everyone was locked inside. However, I do wonder why crime (especially robbery and rape) peaked in the '80s and '90s.
 
 
 When you are done, save your work, switch to GitHub Desktop, then add, commit and push your changes to GitHub and submit the URL of the notebook in ELMS.
