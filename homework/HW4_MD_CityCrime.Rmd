@@ -25,37 +25,36 @@ md_cities <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/he
 Calculate violent and property crime rates for each city for both years using `mutate()`. You'll create four new columns: `violent_rate_2019`, `property_rate_2019`, `violent_rate_2020`, and `property_rate_2020`. You'll need to figure out the proper unit rate, given that there are varying populations. There's no perfect choice; choose the one that works best for you. Save the results to a new dataframe called `md_cities_rates`.
 
 ```{r}
-"md_cities_rates" <- md_cities |> mutate("violent_rate_2019" = violent2019/pop2019 * 10000)
-"md_cities_rates" <- md_cities |> mutate("property_rate_2019" = property2019/pop2019 * 10000)
-"md_cities_rates" <- md_cities |> mutate("violent_rate_2020" = violent2020/pop2020 * 10000)
-"md_cities_rates" <- md_cities |> mutate("property_rate_2020" = property2020/pop2020 * 10000)
+md_cities_rates <- md_cities |> mutate(violent_rate_2019 = violent2019/pop2019 * 10000, property_rate_2019 = property2019/pop2019 * 10000, violent_rate_2020 = violent2020/pop2020 * 10000, property_rate_2020 = property2020/pop2020 * 10000)
 ```
 
 ### Task 4: Describe the Rates
 
 Examine the new dataframe, `md_cities_rates`, by clicking on it in the Environment tab in RStudio and sorting by the rate columns. Write a couple of sentences about the results, comparing and contrasting the cities with the highest rates (both violent and property) in 2019 and 2020. Do you see any patterns? What does this tell you about crime in Maryland cities? What's the story here?
 
-The rates for crimes definitely match the populations; it's larger for any area with more people/crime in general. However, some cities seem to have a higher property crime rate than violent crime rate, regardless of how much crime there is in said cities. 
+Both violent and property rates decreased between 2019 and 2020 for most cities. Property crime has a much higher rate overall, which likely means they will have greater percent changes, as well. However, when there was in an increase in crime, it was only for violent crime, such as in Hyattsville. Some cities had no stats whatsoever, such as Barnesville and Trappe.
 
 ### Task 5: Calculate Percentage Change
 
 Let's add two percentage change columns to your dataframe: one for violent crime rates and one for property crime rates. You'll calculate the percentage change between 2019 and 2020 for each city. Save the results to a new dataframe called `md_cities_change`.
 
 ```{r}
-"md_cities_change" <- pct_change(violent_rate_2019)
+"md_cities_change" <- md_cities_rates |> mutate(pct_change_violent = violent_rate_2020 - violent_rate_2019 / violent_rate_2019 * 100, pct_change_property = property_rate_2020 - property_rate_2019 / property_rate_2019 * 100)
 ```
 
 ### Task 7: Describe Percentage Changes
 
 Look at the `md_cities_change` dataframe by clicking on it in the Environment tab in RStudio. Write a couple of sentences describing the percentage change results. What's more interesting here, the patterns or the outliers? What's the story in the data?
 
-ANSWER HERE
+It's interesting how often violent crime has no data percentage change-wise, but property crime almost always have a drastic change. There's also many outliers because of this. However, the main story is probably how much crime overall increased in towns like Ocean City and Hyattsville.
 
 ### Task 8: Tell the Best Story
 
 Write up a lede and nutgraf of a story with the _best_ story idea you've found in this assignment. The lede should be a single sentence that summarizes the most important information in the data. The nutgraf should be a paragraph that provides more context and explains why the data is important.
 
-ANSWER HERE
+Property crime increased by over 1000% in Ocean City between 2019 and 2020.
+
+According to data observing crime in towns between different Maryland cities, property crime had drastic changes in practically every city. However, Ocean City's data stands out. It also had a 139% increase in violent crime, which is also much higher compared to other Maryland cities.
 
 ### Task 9: Save Your Work and Put it on GitHub
 
