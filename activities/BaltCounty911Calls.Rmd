@@ -74,7 +74,7 @@ summary(daily_calls$call_count)
 
 Let's visualize the time series of daily calls. What patterns do you see? If you had to draw horizontal lines that would highlight unusual days, where would those lines be?
 
-ANSWER HERE
+The first thing I noticed was the obvious peak in Oct. 2022.There's peaks in other places, as well, but especially in Oct. 2022 and later parts of the year/fall and winter. After Jaunary, it randomly drops a lot in the spring, and picks up again slightly in the summer. 
 
 ```{r daily-calls-plot}
 # Plot daily call volume
@@ -137,7 +137,7 @@ unusual_days |>
 
 Let's visualize these unusual days in the context of the full dataset. How do they differ from your answer on Task 3?
 
-ANSWER HERE
+It's the same data, it just highlights what specific peaks are unusually high or low. This makes it a lot easier to identity what trends are newsworthy in the data. 
 
 ```{r plot-unusual-days}
 # Create a clean factor for the plot legend
@@ -207,7 +207,7 @@ ggplot(dow_summary, aes(x = day_of_week, y = avg_calls)) +
 
 We can also calculate z-scores that account for the day of the week pattern. How would you describe the day with the highest z-score without using the term "z-score"?
 
-ANSWER HERE
+Tuesdays, for instance, are 3 standard deviations above the mean (it has a z-score of 3). To put it more simply, an overdose is three times as likely to occur on a Tuesday, or it'll happen 1 in 3 times.
 
 ```{r day-of-week-z-scores}
 # Calculate day-of-week adjusted z-scores
@@ -298,5 +298,4 @@ top_outliers |> kable(digits = 2)
 
 Based on our z-score analysis, what are some potential angles for reporting? What would your next steps be and what would you tell an editor about your findings?
 
-ANSWER HERE
-
+The data is inconsistent at points. The bar chart in task #6 shows that Saturdays are the worst days for drug overdoses, but task #7 highlights that Tuesday has the highest z-score of 3.39, revealing it as an unusual day of the week for overdose reports. The months are also different; task #3 highlights how overdose reports increase in the fall and winter and decrease in the spring, but the graph in task #8 shows basically the opposite. There's definitely trends in the data that are unusual and newsworthy (days of the week and seasonal differences,) but the fact that there are no obvuous reasons for changes between years in the data is questionable and could use some further research.
