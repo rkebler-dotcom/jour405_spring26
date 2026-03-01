@@ -75,7 +75,7 @@ ggplot(accidents, aes(x = date, y = total)) +
 ### Task 1 (3 points)
 Looking at the time series visualization above, identify at least two noticeable patterns or anomalies. What questions would you want to investigate further based on this initial view of the data? How might these visual patterns translate into potential story angles?
 
-ANSWER HERE
+There are two noticeable peaks around 2020 and 2022. The sudden decrease in 2020 was likely because less people were driving places during the pandemic, but what happened in 2022? Why is it such a sharp increase that peaks then is suddenly a sharp decrease? The dats is pretty steady before and after that, so a story about it would likely focus on the random peaks.
 
 The daily data is quite noisy, so let's also look at weekly patterns:
 
@@ -114,7 +114,7 @@ ggplot(accidents, aes(x = day_of_week, y = total)) +
 ### Task 2 (2 points)
 Based on the day-of-week analysis, which day(s) have the highest and lowest average accidents? Why might these patterns exist?
 
-ANSWER HERE
+Fridays, Saturdays and Sundays seem to have the highest averages, and every other day of the week is lower but at a pretty similar average. More people get into accidents on the weekends may be because people drive later at night on the weekends. I'd want to do further research into that. 
 
 ## Calculating Z-Scores
 
@@ -161,7 +161,7 @@ unusual_days |>
 ### Task 3 (3 points)
 Choose one of the top 10 unusual days and research what might have happened on that date. Look for weather events, holidays, major incidents, or other factors that could explain the unusual number of accidents. Briefly describe your findings and how you would incorporate this context into a story.
 
-ANSWER HERE
+On 10/29/21, there was lots and lots of rain and strong winds in the D.C. area. There were no major events or holidays, but the rain could definitely be a factor of the 4.77 z-score that day.
 
 Let's visualize these unusual days:
 
@@ -289,7 +289,7 @@ unusual_monthly |>
 ### Task 5 (2 points)
 Based on the monthly pattern analysis, which months have the highest and lowest average accidents? Develop a hypothesis about why these seasonal patterns exist.
 
-ANSWER HERE
+January has the lowest and October has the highest. I feel like January might be low since there's a lot of snow that month, so people try not to drive too much. But, then again, why is December so high compared to it? I'm not sure what could cause such high numbers in October, aside from what we observed in the earlier tasks of there being more rain than usual. Then again, a month like April would have even more rain.  
 
 ## Identifying Extreme Outliers
 
@@ -314,9 +314,15 @@ if(nrow(extreme_outliers) > 0) {
 ### Task 6 (2 points)
 For the extreme outliers identified (z-scores beyond ±3), what do they have in common?
 
-ANSWER HERE
+They're all over the weekend. 
 
 ## Your Best Story Pitch
 
 ### Task 7 (5 points)
 Based on all the analyses performed, craft your best story pitch, including a headline and lede. Be sure to include what kinds of sources/people you'd talk to for the story.
+
+Headline: Weekends in October: the prime time for accidents
+
+Lede: Studies find that October had the most car accidents out of any month of the year, with a daily average of around 28. Additionally, Fridays had the most car accidents out of every day of the week, with, once again,a daily average of around 28.
+
+Sources: Meterologists/weather reporters, traffic sherrifs, people who live in the area
