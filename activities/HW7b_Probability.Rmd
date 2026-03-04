@@ -1,0 +1,188 @@
+---
+title: "HW7b - Probability and the Normal Distribution"
+---
+
+In this assignment, you'll build on your z-score skills to answer probability questions using the normal distribution. You'll return to the White House salaries data and use it to answer the kinds of "what are the chances?" questions that come up in journalism all the time. This sets the stage for sampling, which we'll cover next.
+
+### Task 1: Load the tidyverse and the data (1 point)
+
+Load the tidyverse and the White House salaries data from https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/white_house_salaries_2025.csv into a dataframe called `wh_salaries`
+
+```{r}
+library(tidyverse)
+wh_salaries <- read_csv('https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/white_house_salaries_2025.csv')
+```
+
+### Task 2: Filter and summarize (2 points)
+
+You may remember from HW3 that some White House staffers have a salary of $0. Let's filter those out and focus on paid employees, saving the result to a new dataframe called `wh_paid`. You need to calculate the mean, median and standard deviation of the salary column using `wh_paid`:
+
+```{r}
+wh_paid <- wh_salaries |>
+  filter(SALARY > 0)
+
+wh_salaries |> 
+  summarize(
+              mean_salary = mean(SALARY),
+            median_salary = median(SALARY),
+            sd_salary = sd(SALARY)
+)
+
+```
+
+Now create a histogram of the paid salaries with a vertical line for the mean and two more for ±1 standard deviation, similar to what you did in HW6 with Spotify data.
+
+```{r}
+wh_paid |> 
+  ggplot() + 
+  geom_histogram(aes(x = SALARY), binwidth = .5, fill = 'blue', color = 'black') 
+
+```
+
+**Describe the shape of the distribution. Is it roughly normal? Skewed? Where do most salaries cluster?**
+
+The distribution is mostly skewed to the right; there's a dip around 100000 and an outlier around 200000, but most of the data is at the lower end of average salaries. The biggest clusters are early in the data before 100000.
+
+### Task 3: The Empirical Rule (3 points)
+
+The empirical rule (also called the 68-95-99.7 rule) says that for a normal distribution:
+- About 68% of data falls within 1 standard deviation of the mean
+- About 95% falls within 2 standard deviations
+- About 99.7% falls within 3 standard deviations
+
+Let's test this. We'll calculate the salary ranges for 1, 2, and 3 standard deviations from the mean, then count how many employees actually fall in each range.
+
+```{r}
+mean_sal <- mean(wh_paid$SALARY)
+sd_sal <- sd(wh_paid$SALARY)
+total_n <- nrow(wh_paid)
+
+empirical <- tibble(
+  range = c("Within 1 SD", "Within 2 SD", "Within 3 SD"),
+  lower = c(mean_sal - sd_sal, mean_sal - 2 * sd_sal, mean_sal - 3 * sd_sal),
+  upper = c(mean_sal + sd_sal, mean_sal + 2 * sd_sal, mean_sal + 3 * sd_sal),
+  expected_pct = c(68, 95, 99.7),
+  actual_count = c(
+    sum(wh_paid$SALARY >= (mean_sal - sd_sal) & wh_paid$SALARY <= (mean_sal + sd_sal)),
+    sum(wh_paid$SALARY >= (mean_sal - 2 * sd_sal) & wh_paid$SALARY <= (mean_sal + 2 * sd_sal)),
+    sum(wh_paid$SALARY >= (mean_sal - 3 * sd_sal) & wh_paid$SALARY <= (mean_sal + 3 * sd_sal))
+  ),
+  actual_pct = round((actual_count / total_n) * 100, 1)
+)
+
+empirical
+```
+
+**How closely does the data follow the empirical rule? What does any deviation tell you about the distribution?**
+
+The data follows the empirical rule pretty closely; the within 2 SD range is off by the most, but only be about 3.8 percent. This tells us that the data is pretty normally skewed, but is pretty flat since the average is a bit off. 
+
+### Task 4: From z-scores to probability with pnorm() (4 points)
+
+Remember the car thefts z-score activity from class? Well, I want to return to that briefly, introduce a new tool called pnorm() and then apply it here. So open that CarTheftZScores notebook and, at the bottom, copy and paste in the contents here: https://gist.githubusercontent.com/dwillis/25102889f576b1707576b85e0be0c353/raw/1ca2be9636497cb5293ff7b1f4e6ed8e27a9e049/car_theft_pnorm.rmd
+
+Re-run all of the blocks in CarTheftZScores notebook, including the code you just pasted in. What's happening there is you are using a function called `pnorm()` to find the probability of a value being less than or equal to a certain z-score. The basic formula to find that probability is:
+
+```
+1 - pnorm(z_score)
+```
+
+Where `z_score` is one row's z-score. Now apply the same approach to salaries.
+
+Your editor asks: **"What's the probability that a randomly selected White House employee makes more than $150,000?"**
+
+To answer this:
+1. Calculate the z-score for $150,000
+2. Use `pnorm()` to find the probability. `pnorm()` gives you the area under the normal curve to the LEFT of a z-score — that is, the probability of being BELOW that value.
+3. Subtract from 1 to get the probability of being ABOVE $150,000
+4. Check your answer against the actual data
+
+```{r}
+
+salary <- 150000
+z_score <- (salary - mean_sal) / sd_sal
+
+prob_less <- pnorm(z_score)
+prob_more <- 1 - prob_less
+prob_more
+
+# Check against actual data
+actual_prob <- sum(wh_paid$SALARY > 150000) / total_n
+actual_prob
+```
+
+**Write a sentence describing this probability in plain English. How does the normal approximation (prob_less) compare to the actual percentage?**
+
+The normal approximation is a lot higher than the actual percentage.
+
+### Task 5: Probability between two values (3 points)
+
+Now your editor asks: **"What percentage of White House employees make between $80,000 and $120,000?"**
+
+You'll need to calculate z-scores for those two figures, use `pnorm()` for each, and subtract to find the probability between them. Update the REPLACE_ME figures with the appropriate numbers.
+
+```{r}
+
+z_lower <- (prob_less - mean_sal) / sd_sal
+z_upper <- (prob_more - mean_sal) / sd_sal
+
+prob_between <- pnorm(z_upper) - pnorm(z_lower)
+prob_between
+
+# Verify with actual data
+actual_between <- sum(wh_paid$SALARY >= mean_sal & wh_paid$SALARY <= actual_prob) / total_n
+actual_between
+
+```
+
+**Interpret this result. What does this "middle range" tell us about the White House salary structure?**
+
+It is a very skewed distribution all around. A negative z-score shows that there is a lot everywhere.
+
+### Task 6: Expected vs. observed (3 points)
+
+Let's compare what the normal distribution *predicts* to what we actually *see*. This idea — comparing expected to observed — is one you'll use again later in the course.
+
+Create these salary bins and calculate the expected count (from the normal distribution) and the observed count (from the actual data) for each:
+
+```{r}
+bins <- tibble(
+  category = c("Below $60k", "$60k-$90k", "$90k-$120k", "$120k-$150k", "Above $150k"),
+  lower = c(-Inf, 60000, 90000, 120000, 150000),
+  upper = c(60000, 90000, 120000, 150000, Inf)
+) |>
+  mutate(
+    expected_pct = pnorm(upper, mean = mean_sal, sd = sd_sal) - pnorm(lower, mean = mean_sal, sd = sd_sal),
+    expected_count = round(expected_pct * total_n, 1),
+    observed_count = c(
+      sum(wh_paid$SALARY < 60000),
+      sum(wh_paid$SALARY >= 60000 & wh_paid$SALARY < 90000),
+      sum(wh_paid$SALARY >= 90000 & wh_paid$SALARY < 120000),
+      sum(wh_paid$SALARY >= 120000 & wh_paid$SALARY < 150000),
+      sum(wh_paid$SALARY >= 150000)
+    ),
+    difference = observed_count - expected_count
+  )
+
+bins |> select(category, expected_count, observed_count, difference)
+```
+
+**Where does reality differ most from what the normal distribution predicts? What might explain those differences?**
+
+It's most different at the 60k-90k range. This is probably because it's in the middle range, which has the most clustered data and is near the average, so there might be some confusion with the z-score. It's also an area that changed a lot between different calculations in general.
+
+### Task 7: Story pitch (4 points)
+
+Based on your probability analysis, write a headline and lede for a story about White House salaries. Your lede should incorporate at least one probability or percentage you calculated.
+
+Then write 2-3 sentences describing how you would use probability thinking to advance this story — what could you compare these probabilities to, and what additional analysis would help?
+
+Headline: White House salaries are at a low skew
+
+Lede: Data shows that salaries of White House are skewed to the right, with an average salary of $109117.4.
+
+I would want to research more about the amount of data that's far from the average. I'd assume since there's so many different positions in the White House, some taking many more responsibilities than others, there would be a lot of outliers when it comes to what they're paid. Additionally, some roles in departments like international relations and economics change pretty frequently with developments in the world, so their salary might be much different year by year.
+
+### Task 8: Save Your Work and Put it on GitHub
+
+Save this notebook, then commit it to your local repository. Push the changes to your GitHub repository and submit the URL for this file in ELMS.
