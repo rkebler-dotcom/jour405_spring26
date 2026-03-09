@@ -6,11 +6,24 @@ In this assignment, you'll be picking up where you left off with the M&Ms activi
 
 ### Task 1: Load the tidyverse
 
+```{r}
+library(tidyverse)
+```
+
 
 ### Task 2: Load the M&Ms dataset from https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/mandms.csv
 
+```{r}
+read_csv('https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/mandms.csv')
+```
+
 
 ### Task 3: Sample 5 rows of data from the dataset
+
+```{r}
+set.seed(42) 
+sampled_data <- spec_table |> sample(n = 5)
+```
 
 
 ### Task 4: Calculate the mean age and standard deviation of the sample, using either the blue or white number of M&Ms
