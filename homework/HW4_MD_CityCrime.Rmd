@@ -59,3 +59,17 @@ According to data observing crime in towns between different Maryland cities, pr
 ### Task 9: Save Your Work and Put it on GitHub
 
 Save this notebook, then commit it to your local repository. Push the changes to your GitHub repository and submit the URL for this file in ELMS.
+
+### Task 10: HW 5
+
+```{r}
+md_cities_percentiles <- md_cities_change |>
+  mutate(violent_percentile = ntile(violent_rate_2020, 100))
+```
+
+```{r}
+md_cities_percentiles |>
+  summarize(IQR = IQR(violent_rate_2020))
+```
+
+This info doesn't really change my story topic: Ocean City shows a 100 in the violence percentile. It still stands out. Additionally, knowing the IQR is only 41..9, that just further proves Ocean City has stats that are far above average and not within a reasonable range.
