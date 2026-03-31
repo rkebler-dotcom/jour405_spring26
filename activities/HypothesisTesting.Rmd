@@ -28,11 +28,9 @@ library(tidyverse)
 
 Before we analyze data, let's understand the framework:
 
-**Null Hypothesis (H₀):** The new program had NO effect on response times. Any difference we see is due to random chance.
+**Null Hypothesis (H₀):** The new program had NO effect on response times. There is no significant difference.
 
 **Alternative Hypothesis (H₁):** The new program DID reduce response times. The difference we observe is real.
-
-**Alpha Level (α):** We'll use 0.05, meaning we're willing to accept a 5% chance of being wrong when we reject the null hypothesis.
 
 ## Step 3: Create the Dataset
 
@@ -72,8 +70,6 @@ summary_stats <- response_data |>
     sample_mean = mean(response_time),
     sample_sd = sd(response_time),
     standard_error = sample_sd / sqrt(sample_size),
-    min_time = min(response_time),
-    max_time = max(response_time)
   )
 
 summary_stats
@@ -85,20 +81,49 @@ summary_stats
 
 But is this difference *statistically significant*, or could it have occurred by chance?
 
+The sample mean is a lot lower than the baseline, especially when considering the standard error and sample standard deviation. The values are more compressed and the sample size is small, showing improvement. This is clearly meaningful/significant, so I'd want to know more as to why this happening.
+
 ## Step 5: Perform a One-Sample t-Test
 
 Since we're testing whether the new times are *lower* than the baseline, we use a one-sided test.
 
 ```{r}
+
+alpha <- 0.05
+
 # Perform the t-test
 t_test_result <- t.test(
   response_data$response_time,
-  mu = baseline_mean,
+  mu = 8.2,
   alternative = "less"  # We expect times to be LESS (faster)
 )
 
 t_test_result
 ```
+Based on the p-value, can we reject the null hypothesis? What does this tell the police chief — and what does it NOT tell him?
+
+All we can do at this point is reject the null hypothesis. It doesn't prove that the calls are for sure going down.
+
+```{r}
+effect_size <- (baseline_mean - summary_stats$sample_mean) / baseline_mean
+
+effect_size_interpretation <- case_when(
+  abs(effect_size) < 0.2 ~ "Negligible",
+  abs(effect_size) < 0.5 ~ "Small",
+  abs(effect_size) < 0.8 ~ "Medium",
+  TRUE ~ "Large"
+)
+
+tibble(
+  `Cohen's d` = round(effect_size, 3),
+  `Interpretation` = effect_size_interpretation,
+  `Difference in minutes` = round(baseline_mean - summary_stats$sample_mean, 2),
+  `Difference in seconds` = round((baseline_mean - summary_stats$sample_mean) * 60, 0)
+)
+```
+**Answer this question:** The result is statistically significant, but the effect size is small. In practical terms, the improvement is about 25 seconds per call. The police chief is claiming success. Would you write a story saying the program works? How would you frame the findings honestly — acknowledging both that the improvement is real AND that it's small?
+
+I would want to know more about the data in larger sample sizes to prove the significance, but I generally think a story about this is possible. The Cohen's d practically proves there is a significant difference from the changes made. I would still want to do more research on it before publishing anything.
 
 ## Step 6: Interpret the Results
 
@@ -229,18 +254,23 @@ p_value_guide <- tibble(
 knitr::kable(p_value_guide, caption = "Guide to Interpreting P-values")
 ```
 
-## Conclusion: Writing the Story
+The videos you watched describe two questions you need to ask about any statistical result:
 
-Based on our analysis:
+1. **Is it statistically significant?** (Is the result unlikely to be due to chance?)
+2. **Is it meaningfully significant?** (Is the effect large enough to matter?)
 
-**For the one-sample test (community policing program):**
-- The mean response time decreased from `r baseline_mean` minutes to `r round(summary_stats$sample_mean, 2)` minutes
-- This represents a `r round((baseline_mean - summary_stats$sample_mean) / baseline_mean * 100, 1)`% improvement
-- The p-value of `r round(p_value, 4)` is `r ifelse(p_value < 0.05, "less", "greater")` than 0.05
-- `r ifelse(p_value < 0.05, "We have statistical evidence that the program improved response times", "We cannot conclude the program made a significant difference")`
+Apply this framework to the community policing data:
 
-**For the two-sample test (neighborhood comparison):**
-- Downtown response times (mean: `r round(mean(neighborhood_data$response_time[neighborhood_data$neighborhood == "Downtown"]), 1)` min) are significantly faster than suburban times (mean: `r round(mean(neighborhood_data$response_time[neighborhood_data$neighborhood == "Suburbs"]), 1)` min)
-- This difference is statistically significant (p < 0.001)
+**Question 1:** Write 1-2 sentences answering whether the result is statistically significant and how you know.
 
-**Remember:** Statistical significance tells us whether an effect exists, but not whether it matters. In the next activity, we'll learn about effect size to measure how meaningful these differences actually are.
+The data is statistically significant. We see a big difference between the sample and data mean and also a strong difference from calculating Cohen's d. 
+
+**Question 2:** Write 1-2 sentences answering whether the result is meaningfully significant. Consider: the program cost the city $2 million to implement. Is a 25-second improvement in response times worth that investment? What context would you need to answer that question?
+
+There should be more research to prove this, but generally we see a meaningful significance in the mean from the shifts in data. I would want more context as to why this is happening just to prove this isn't luck.
+
+**Question 3:** Write a headline and a 2-3 sentence lede for a story about these findings. Your text should accurately reflect both the statistical significance and the effect size — don't let the police chief's framing drive the story if the data tells a more nuanced one.
+
+The Westbrook police department sees a .42 minute shift in police call response times.
+
+When you are finished, save your work, switch to GitHub Desktop, then add, commit and push your changes to GitHub and submit the URL of the notebook in ELMS.
