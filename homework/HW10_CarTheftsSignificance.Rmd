@@ -9,7 +9,7 @@ Your editor wants to know if there have been recent changes in the number of car
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-# LOAD THE TIDYVERSE
+library(tidyverse)
 ```
 
 
@@ -30,7 +30,7 @@ glimpse(car_thefts)
 
 We'll make a line chart using geom_line() to try and illustrate any trend over time. What's your initial reaction to the change in car thefts? Is there a trend?
 
-PUT ANSWERS HERE
+I don't notice any consistent trends, but there's definitely a steady decrease of car thefts over the past couple years.
 
 ```{r}
 
@@ -61,7 +61,7 @@ Let's add some stats to that process - mean and standard deviation - and calcula
 theft_summary <- car_thefts |> 
   summarize(
     mean_thefts = mean(total),
-    sd_thefts = sd(REPLACE_ME),
+    sd_thefts = sd(total),
     months = n(),
     se_thefts = sd_thefts / sqrt(months),
     margin_error = qt(0.975, df = months - 1) * se_thefts,  # Using t-distribution for small sample
@@ -110,7 +110,9 @@ ggplot(aes(x = month, y = total)) +
 - What figure(s) accurately reflects the number of car thefts in a typical month?
 - Propose a headline about the trend in car thefts that is focused on the present and future, but informed by the data you see above.
 
-PUT YOUR ANSWERS HERE.
+- The 95% confidence reveals that we are pretty much certain that data revolving around the mean in that red bae is logical (not due to random occurence) and can be further looked into.
+- A lot of the data in 2024 and 2025 follows this confidence interval.
+- Sudden decrease seen in Prince George's County car thefts in 2026.
 
 
 ### Task 7: Is the recent trend significant?
@@ -138,11 +140,11 @@ t_test_periods
 period_summary <- car_thefts |> 
   group_by(period) |> 
   summarize(
-    mean_thefts = mean(REPLACE_ME),
+    mean_thefts = mean(total),
     sd_thefts = sd(total),
     months = n(),
     se_thefts = sd_thefts / sqrt(months),
-    margin_error = qt(0.975, df = REPLACE_ME - 1) * se_thefts, # look at how we calculated this above
+    margin_error = qt(0.975, df = 32 - 1) * se_thefts, # look at how we calculated this above
     ci_lower = mean_thefts - margin_error,
     ci_upper = mean_thefts + margin_error
   )
@@ -170,8 +172,9 @@ Given the above chart, is the difference between the two periods statistically s
 
 How would you revise your headline from Task 6, if at all? What would you tell your editor, and what would you expect her to ask you?
 
-PUT ANSWERS HERE
+The data is clearly within the standard deviation, so it is a statistically significant difference. This being said, we can reject the null hypothesis.
 
+I wouldn't change my headline from before. The next step I'd ask my editor about is researching why the difference has occurred. 
 
 
 When you are finished, add, commit and push your notebook and submit the URL in ELMS.
