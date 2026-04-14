@@ -49,5 +49,25 @@ matches |>
 
 ### Task 6: Describe the results of both the correlation calculation and the scatterplot.
 
+The correlation is pretty flat and spread out in a blob, proving that there's no correlation. The literal correlation calculation is also pretty low, so that proves it further. 
+
+
+### Task 7: Choose another variable and repeat the steps in Tasks 4-5, then describe the result
+```{r}
+matches <- matches |> mutate(card_diff = yellow_cards - red_cards)
+```
+```{r}
+matches |> summarize(correlation = cor(sh_att, so_g, method="pearson"))
+```
+```{r}
+matches |> 
+  ggplot() +
+  geom_point(aes(x=sh_att, y=so_g)) +
+  geom_smooth(aes(x=sh_att, y=so_g), method="lm")
+```
+
+
+There's a relatively big correlation between shot attempts and shots on goal. However, the scatterplot also shows a clmup around 20-30 shot attempts, meaning there's likely more to analyze in this correlation. 
+
 
 When you are done, save your work, switch to GitHub Desktop, then add, commit and push your changes to GitHub and submit the URL of the notebook in ELMS.
