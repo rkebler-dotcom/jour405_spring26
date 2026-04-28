@@ -1,5 +1,4 @@
 
-```
 
 Final Project: The Tests You Could Run
 
@@ -17,8 +16,9 @@ Final Project: Trials, Errors, and Lessons
 load(BillGrammy)
 ```
 ```{r}
-library(data)
+library(tidyverse)
 ```
+
 ```{r}
 library(readr)
 ```
@@ -31,3 +31,5 @@ I genuinely don't know what I'm doing wrong. I've changed the format from RScrip
 It's possible that I need to rename the data first, or that the datasets are too large to do anything with. I'm just not sure exactly what to do.
 
 I also tried to load data from the_grammy_awards set and got the same thing.
+
+Update: fixed it in class.
