@@ -1,6 +1,6 @@
 ---
 title: "Multiple Regression Analysis: Maryland Voter Turnout"
-name: "YOUR NAME HERE"
+name: "Rachel Kebler"
 ---
 
 # Introduction
@@ -26,8 +26,7 @@ head(md_turnout)
 
 Before building our model, let's explore the data to understand the variables and their relationships. Examine the correlation matrix to see how the independent variables relate to each other and to the dependent variable (voter turnout). Which variables seem to be correlated? Are there any that are not correlated at all? Also look at the multiple scatterplots. Which variables seem to have a linear relationship with the dependent variable? Which do not?
 
-ANSWER HERE
-
+Based on the circles, there seems to be a pretty strong correlation between the percentage employed and voter turnout, as well as the percentage of white voters and voter turnout. There is also a pretty strong correlation between the percentage of voters with a higher income and a bachelor's degree or higher. I don't see any correlation between the median age and percentage with a bachelor's degree or higher. There's also not much between the percentage of white voters and income. Looking at the scatterplots, it looks like there's a strong correlation between the percentage of voters unemployed and the voter turnout, as there aren't many residuals (points far from the slope) and the datapoints are generally scattered. I don't really see a correlation between population and the voter turnout, as the data is sort of just clumped all together at the top with several residuals as we go along the x-axis. Also, the slope is very horizontal. This the same for the correlation between the percentage of voters with a bachelor's degree or higher and voter turnout. 
 
 ```{r}
 # Summary statistics
@@ -89,12 +88,14 @@ The coefficients tell us the estimated effect of each independent variable on th
 
 Examine the output of the model, checking the coefficients, residuals, and overall model fit. How well does this multiple variable model predict turnout? Do any of the variables seem to be insignificant? Is this a useful model, based on what you've seen? Why?
 
-ANSWER HERE
+Right off the bat, we don't see that bad of a residual standard error. We see a min of around -0.05 and a max of .02, so neither are far off from zero. We also see a very high multiple r-squared calculation, meaning much of the variability is explained by the model. It doesn't even change too much when adjusted, dropping only about 5% from before, making it seem pretty trustworthy. Lastly, we see a low p-value with an f-statistic of 16.55, suggesting the model is statistically significant. Based on all of this, it seems to be a useful model. Much of the data is explained by the model and lacks errors. 
+
+When population or percent with bachelors degrees and higher or percent employed is removed, the data doesn't change much. There's a big shift with income and median age being removed, as seen by the increases in p-values and residuals. 
 
 ```{r}
 # Build initial model with all predictors
-initial_model <- lm(turnout ~ population + income + pct_bachelors_higher + 
-                   pct_unemployed + median_age + pct_white, data = md_turnout)
+initial_model <- lm(turnout ~ population + income + pct_bachelors_higher + pct_unemployed 
+                + median_age + pct_white, data = md_turnout)
 summary(initial_model)
 
 ```
@@ -103,19 +104,19 @@ summary(initial_model)
 
 Create three alternative models by adding or removing variables to see if we can improve the model's performance. Turnout will always be the dependent variable, but you should alter the independent variables by removing or adding some. Then compare the models using adjusted R-squared values. Are any of the models significantly better than the others?
 
-ANSWER HERE
+The highest multiple r-squared occurs when we remove just the percentage of white voters. However, this is a lot lower than the full model multiple r-squared, going down by about 35%. Removing just median age or income makes this even lower, the median age multiple r-squared being at around 22% and the income multiple r-squared being at around 18%. Removing something like percentage with bachelor's degrees or higher that seemed to not change the model much when removed before create an even lower multiple r-squared when removed in this model.
 
 ```{r}
 # Model 2
-model2 <- lm(turnout ~ REPLACE ME, data = md_turnout)
+model2 <- lm(turnout ~ income, data = md_turnout)
 summary(model2)
 
 # Model 3
-model3 <- lm(turnout ~ REPLACE ME, data = md_turnout)
+model3 <- lm(turnout ~ median_age, data = md_turnout)
 summary(model3)
 
 # Model 4
-model4 <- lm(turnout ~ REPLACE ME, data = md_turnout)
+model4 <- lm(turnout ~ pct_white, data = md_turnout)
 summary(model4)
 
 # Compare models
@@ -144,4 +145,4 @@ ggplot(model_comparison, aes(x = reorder(Model, Adjusted_R_squared), y = Adjuste
 
 Without using the words "multiple regression model", describe how you could use this analysis to cover an election or voter participation story.
 
-ANSWER HERE
+These tests help us understand what factors are correlated. When we don't consider factors like the racial composition or income in these counties we're observing, we'll have a harder time calculating the voter turnout of each county. When we include (or even remove) factors like these, we can better predict voter outcomes and know the reasons why some counties have a better turnout than others.
