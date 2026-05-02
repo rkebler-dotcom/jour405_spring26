@@ -104,7 +104,7 @@ summary(initial_model)
 
 Create three alternative models by adding or removing variables to see if we can improve the model's performance. Turnout will always be the dependent variable, but you should alter the independent variables by removing or adding some. Then compare the models using adjusted R-squared values. Are any of the models significantly better than the others?
 
-The highest multiple r-squared occurs when we remove just the percentage of white voters. However, this is a lot lower than the full model multiple r-squared, going down by about 35%. Removing just median age or income makes this even lower, the median age multiple r-squared being at around 22% and the income multiple r-squared being at around 18%. Removing something like percentage with bachelor's degrees or higher that seemed to not change the model much when removed before create an even lower multiple r-squared when removed in this model.
+The highest multiple r-squared occurs when we remove just the percentage of white voters. However, this is a lot lower than the full model multiple r-squared, going down by about 35%. Removing just median age or income makes this even lower, the median age multiple r-squared being at around 22% and the income multiple r-squared being at around 18%. Removing something like percentage with bachelor's degrees or higher that seemed to not change the model much when removed before create an even lower multiple r-squared when removed in this model. This reveals how important each variable is to the model. 
 
 ```{r}
 # Model 2
