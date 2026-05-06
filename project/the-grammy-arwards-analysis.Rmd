@@ -13,17 +13,11 @@ I additionally think a general hypothesis test would be good, but I'm not exactl
 Final Project: Trials, Errors, and Lessons
 
 ```{r}
-load(BillGrammy)
-```
-```{r}
 library(tidyverse)
 ```
 
 ```{r}
-library(readr)
-```
-```{r}
-Billboard_Grammy <- read_csv('BillGrammy.csv')
+BillGrammy <- read_csv('BillGrammy.csv')
 ```
 
 I genuinely don't know what I'm doing wrong. I've changed the format from RScript, R Markdown, HTML, and I keep getting nothing or the response "Error: attempt to use zero-length variable name." I've loaded the daa into the environment, so I'm not sure what I can do besides that. If anything, it likely means I have to rename the data using the <- function, but not even that worked for me. Same for library(tidyverse) or library(data). I also tried using the direct links, but that didn't work either. 
@@ -33,3 +27,20 @@ It's possible that I need to rename the data first, or that the datasets are too
 I also tried to load data from the_grammy_awards set and got the same thing.
 
 Update: fixed it in class.
+
+```{r}
+BillGrammy |> filter(!is.na(`Weeks on Chart`)) |> summarize(correlation = cor(`Weeks on Chart`, Grammy, method="pearson"))
+```
+```{r}
+BillGrammy |> filter(!is.na(`Weeks on Chart`)) |> lm(filter(`Weeks on Chart`), data = 'grammy') |> summary()
+```
+```{r}
+lm('peak' ~ 'year_win', data = 'grammy') |> summary()
+```
+
+```{r}
+lm(`peak` ~ `year win`, data = Grammy) |> summary()
+lm(`Weeks on Chart` ~ `year win`, data = Grammy) |> summary()
+```
+
+before submitting: clear environment with broom then "run all"
