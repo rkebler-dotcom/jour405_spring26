@@ -28,19 +28,58 @@ I also tried to load data from the_grammy_awards set and got the same thing.
 
 Update: fixed it in class.
 
+maybe include a test from the original to test this?
+
+-----------------------------------------------------------------------------------------------------------------
+
+FINAL PROJECT:
+
+The Grammys have been a staple in the music and entertainment awards since around 
+
+Many people are curious as to how the Grammy winners are calculated, and, more specifically, if there is an accessible way to predict them. One GitHub project I found from user JLUT referenced weekly Billboard Hot 100 songs from 1999 through 2018 to see if they could be used to predict the Grammy winners. Using the same dataset, I will figure out whether or not this correlation has drastically changed over time.
+
+First, I will clean up the data then run a simple correlation test to see if there's a correlation between the number of weeks a song is on the Billboard Hot 100 and how many Grammys it wins.
+
 ```{r}
 BillGrammy |> filter(!is.na(`Weeks on Chart`)) |> summarize(correlation = cor(`Weeks on Chart`, Grammy, method="pearson"))
 ```
-```{r}
-BillGrammy |> filter(!is.na(`Weeks on Chart`)) |> lm(filter(`Weeks on Chart`), data = 'grammy') |> summary()
-```
-```{r}
-lm('peak' ~ 'year_win', data = 'grammy') |> summary()
-```
+Based on this alone, there's clearly a very small correlation of just .051. But I still want to find out if this is a timeline-based thing. It's possible that there was a sudden drop in the correlation due to changes in policy/certain events that brought it down, so I want to check if this is a consistent trend.
+
+Before that, let's check if using linear models are reliable.
 
 ```{r}
-lm(`peak` ~ `year win`, data = Grammy) |> summary()
-lm(`Weeks on Chart` ~ `year win`, data = Grammy) |> summary()
+filtered_grammy <- BillGrammy |> filter(!is.na(`Weeks on Chart`))
+lm(`Weeks on Chart` ~ `Year Win`, data = filtered_grammy) |> summary()
+
 ```
+By the looks of this, I wouldn't trust this model. The residuals are around -27 and +60, meaning that the calculations could be off by that many points. While the p-value is low, the residuals are high and multiple r-squared (both normal and adjusted) is very low. 
+
+Next, I'll try seeing if it's possible that there's a correlation between the peak position of a song on the Hot 100 and how many Grammys it wins.
+
+```{r}
+lm(Peak ~ `Year Win`, data = BillGrammy) |> summary()
+```
+We're seeing very similar results here with high residuals, low r-squared values and also a very high p-value this time. 
+
+Let's get a visual sense of these correlations with scatterplots. 
+```{r}
+filtered_grammy |>
+  ggplot(aes(x = `Year Win`, y = `Weeks on Chart`)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(x = "Year Win", y = "Weeks on Chart",
+       title = "Grammy Winners and their Weeks on Billboard over time")
+```
+```{r}
+filtered_grammy |>
+  ggplot(aes(x = `Year Win`, y = `Peak`)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(x = "Year Win", y = "Peak",
+       title = "Grammy Winners and their Peaks on Billboard over time")
+```
+Both of these scatterplots are very horizontal and show a lot of residuals in general. Not very cohesive. It is interesting, however, how the weeks on chart correlation increased over time and how the peak decreased over time. The weeks on chart incline is also a bit more steep. 
+
+Overall, looking at these multiple regression tests and scatterplots, there's clearly not much of a change over time or a correlation in the first place. I wouldn't really consider this a newsworthy story as a result. 
 
 before submitting: clear environment with broom then "run all"
