@@ -1,17 +1,5 @@
 
 
-Final Project: The Tests You Could Run
-
-I think a correlation test, similar to the one we did in the Soccer Fouls activity last week, would be super useful for my project. Comparing the popularity of each song on Spotify/streaming services and whether or not/how often they win would be a good way to analyze if the Grammy's are following popular listening trends or are based on some other factor.
-
-Also, a histogram running this correlation would obviously be great for my (initial) hypothesis. It would visualize whether or not the Grammy's have gotten better or worse in terms of popularity over time. 
-
-I additionally think a general hypothesis test would be good, but I'm not exactly sure what I would test with that. I haven't found enough accessible data to track the literal viewership of the Grammy's over time, so I might have to shift my hypothesis to focus more on whether or not the Grammy's truly follow listener's interests by measuring the number of Spotify streams for each Grammy winner. 
-
------------------------------------------------------------------------------------------------------------------
-
-Final Project: Trials, Errors, and Lessons
-
 ```{r}
 library(tidyverse)
 ```
@@ -20,20 +8,6 @@ library(tidyverse)
 BillGrammy <- read_csv('BillGrammy.csv')
 ```
 
-I genuinely don't know what I'm doing wrong. I've changed the format from RScript, R Markdown, HTML, and I keep getting nothing or the response "Error: attempt to use zero-length variable name." I've loaded the daa into the environment, so I'm not sure what I can do besides that. If anything, it likely means I have to rename the data using the <- function, but not even that worked for me. Same for library(tidyverse) or library(data). I also tried using the direct links, but that didn't work either. 
-
-It's possible that I need to rename the data first, or that the datasets are too large to do anything with. I'm just not sure exactly what to do.
-
-I also tried to load data from the_grammy_awards set and got the same thing.
-
-Update: fixed it in class.
-
-maybe include a test from the original to test this?
-
------------------------------------------------------------------------------------------------------------------
-
-FINAL PROJECT:
-
 The Grammys have been a staple in the music and entertainment awards since around 
 
 Many people are curious as to how the Grammy winners are calculated, and, more specifically, if there is an accessible way to predict them. One GitHub project I found from user JLUT referenced weekly Billboard Hot 100 songs from 1999 through 2018 to see if they could be used to predict the Grammy winners. Using the same dataset, I will figure out whether or not this correlation has drastically changed over time.
@@ -41,15 +15,16 @@ Many people are curious as to how the Grammy winners are calculated, and, more s
 First, I will clean up the data then run a simple correlation test to see if there's a correlation between the number of weeks a song is on the Billboard Hot 100 and how many Grammys it wins.
 
 ```{r}
-BillGrammy |> filter(!is.na(`Weeks on Chart`)) |> summarize(correlation = cor(`Weeks on Chart`, Grammy, method="pearson"))
+BillGrammy |> filter(!is.na(`Weeks on Chart`)) |> summarize(correlation = cor(`Weeks on Chart`, Grammy, method="spearman"))
+BillGrammy |> filter(!is.na(Peak)) |> summarize(correlation = cor(Peak, Grammy, method="spearman"))
 ```
-Based on this alone, there's clearly a very small correlation of just .051. But I still want to find out if this is a timeline-based thing. It's possible that there was a sudden drop in the correlation due to changes in policy/certain events that brought it down, so I want to check if this is a consistent trend.
+EDIT: Based on this alone, there's clearly a very small correlation of just .051. But I still want to find out if this is a timeline-based thing. It's possible that there was a sudden drop in the correlation due to changes in policy/certain events that brought it down, so I want to check if this is a consistent trend.
 
 Before that, let's check if using linear models are reliable.
 
 ```{r}
-filtered_grammy <- BillGrammy |> filter(!is.na(`Weeks on Chart`))
-lm(`Weeks on Chart` ~ `Year Win`, data = filtered_grammy) |> summary()
+filtered_grammy <- BillGrammy |> filter(!is.na(`Weeks on Chart`), !is.na(Peak))
+lm(`Peak` ~ `Weeks on Chart`, data = filtered_grammy) |> summary()
 
 ```
 By the looks of this, I wouldn't trust this model. The residuals are around -27 and +60, meaning that the calculations could be off by that many points. While the p-value is low, the residuals are high and multiple r-squared (both normal and adjusted) is very low. 
@@ -61,12 +36,20 @@ lm(Peak ~ `Year Win`, data = BillGrammy) |> summary()
 ```
 We're seeing very similar results here with high residuals, low r-squared values and also a very high p-value this time. 
 
-Let's get a visual sense of these correlations with scatterplots. 
+Let's get a visual sense of these correlations with line charts. 
 ```{r}
+filtered_grammy |> 
+  filter(!is.na(`Weeks on Chart`), !is.na(Peak)) |> 
+  group_by(Genre) |> 
+  summarize(
+    avg_weeks = mean(`Weeks on Chart`),
+    min_weeks = min(`Weeks on Chart`),
+    max_weeks = max(`Weeks on Chart`),
+    count = n()
+  )
 filtered_grammy |>
   ggplot(aes(x = `Year Win`, y = `Weeks on Chart`)) +
-  geom_point() +
-  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  geom_line() +
   labs(x = "Year Win", y = "Weeks on Chart",
        title = "Grammy Winners and their Weeks on Billboard over time")
 ```
@@ -79,6 +62,55 @@ filtered_grammy |>
        title = "Grammy Winners and their Peaks on Billboard over time")
 ```
 Both of these scatterplots are very horizontal and show a lot of residuals in general. Not very cohesive. It is interesting, however, how the weeks on chart correlation increased over time and how the peak decreased over time. The weeks on chart incline is also a bit more steep. 
+
+TALK ABOUT GENRES
+
+Now, I want to look at the Billboard Hot 100 chart on its own and see if there's any predictions I can make between its factors. I'll once again be looking at correlations between weeks/peaks on the chart and if there's a correlation between those, as well as if said correlations have drastically changed over time. 
+
+The data tracks the charts as far back as 1958 (the start? of the charts) to 2021;
+
+First, I'll load the data.
+
+```{r}
+BillBoardHot100 <- read_csv('charts.csv')
+```
+Next, we'll do the simple correlation tests again. I have weeks on chart, peak ranking and this time, the rank the song recieved the previous week.
+
+```{r}
+BillBoardHot100 |> summarize(correlation = cor(`weeks-on-board`, rank, method="spearman"))
+BillBoardHot100 |> summarize(correlation = cor(`peak-rank`, rank, method="spearman"))
+BillBoardHot100 |> filter(!is.na(`last-week`)) |> summarize(correlation = cor(`last-week`, rank, method="spearman"))
+```
+It looks like there's strong correlations between the overall ranks and their previous week ranks, as well as their peak ranks. This is pretty expected, especially for the difference between the previous and current weeks. If anything, that just shows it doesn't change much between weeks. It is interesting how it's not a perfect correlation, though. I'd like to visualize how it changes over time.
+
+More importantly, however, the correlation between the weeks on board and rank are a bit lower than I thought, and also going at a negative slope. It's interesting to hear that it's decreased over time. Once again, I'd like to visualize it for that reason.
+
+So, let's visualize it. 
+
+```{r}
+BillBoardHot100 |>
+  ggplot(aes(x = `date`, y = `weeks-on-board`)) +
+  geom_line() +
+  labs(x = "date", y = "weeks-on-board",
+       title = "How long BillBoard Hot 100 songs are on board")
+```
+This is pretty interesting. We see a relatively steady incresse over time, but there's some random gaps here and there. That could just be because some of the data is grouped
+
+```{r}
+BillBoardHot100 |>
+  ggplot(aes(x = `date`, y = `peak-rank`)) +
+  geom_line() +
+  labs(x = "date", y = "peak-rank",
+       title = "Peaks of BillBoard winners over time")
+```
+```{r}
+BillBoardHot100 |>
+  ggplot(aes(x = `date`, y = `last-week`)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(x = "date", y = "last-week",
+       title = "Changes from previous week of BillBoard winners over time")
+```
 
 Overall, looking at these multiple regression tests and scatterplots, there's clearly not much of a change over time or a correlation in the first place. I wouldn't really consider this a newsworthy story as a result. 
 
