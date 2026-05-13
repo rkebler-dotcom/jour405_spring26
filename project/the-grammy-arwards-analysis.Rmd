@@ -1,4 +1,18 @@
+PREDICTING THE WINNERS FROM AFAR: AN ANALYSIS OF GRAMMY-WINNING SONGS USING BILLBOARD HOT 100 DATA
 
+The Grammy Awards (Grammys) have been a staple in the music and entertainment awards since they began in May 1959, according to their website (https://www.grammy.com/awards/1st-annual-grammy-awards.) With around 20,000 entires submitted every year, the Grammy Awards give a chance for musicians and producers, or members of the Recording Academy, to vote on winners of the award (source: https://www.recordingacademy.com/awards.) There are several categories to within the annual award ceremony, with 10 categories across three genre fields and six categories in the General field. Some of these awards include Best New Artist in the General field and Best Album for genres ranging from Dance/Pop to Country. 
+
+Many people are curious as to how Grammy winners are calculated, and, more specifically, if there is an accessible way to predict them. Some tests done include tracking Spotify listener data to see if the Grammys coalign with the popularity of songs within audiences (https://www.latimes.com/projects/grammys-vs-spotify-how-top-music-differs/).
+
+My initial goal with this project was to see if the popularity of the Grammys themselves has increased or decreased, as I've heard many people speak out against the Grammys over time. However, I had a lot of trouble finding free data for those stats, so I improvised and decided to focus on what predictions can be made by non-musical-experts. 
+
+One GitHub project I found from user JLUT referenced weekly Billboard Hot 100 songs from 1999 through 2018 to see if they could be used to predict the Grammy winners (https://github.com/JLUT/Billboard_Grammy_Project1/blob/main/README.md). Using the same dataset, I wanted to at first see how specific factors, such as how long a song is on the Billboard charts and what rank it peaks at, affect the number of Grammys a Billboard Hot 100 song wins. I ran into problems; there wasn't much of a correlation in general, as you'll see in my tests below. As a result, I then tried to see if the factors alone have changed much over time, hoping to potentially analyze if the factors have become any more or less effective towards the winners over time. But, once again, there wasn't really a newsworthy shift. 
+
+So, I then added another dataset with just the Billboard Hot 100 data alone to see if there were similar patterns with non-Grammy-winning songs on the Hot 100, as well. Unexpectedly, with an error I made, this was where things got interesting.
+
+CODE BLOCKS AND NARRATIVES:
+
+First, let's load the tidyverse and first dataset. 
 
 ```{r}
 library(tidyverse)
@@ -8,45 +22,34 @@ library(tidyverse)
 BillGrammy <- read_csv('BillGrammy.csv')
 ```
 
-The Grammys have been a staple in the music and entertainment awards since around 
-
-Many people are curious as to how the Grammy winners are calculated, and, more specifically, if there is an accessible way to predict them. One GitHub project I found from user JLUT referenced weekly Billboard Hot 100 songs from 1999 through 2018 to see if they could be used to predict the Grammy winners. Using the same dataset, I will figure out whether or not this correlation has drastically changed over time.
-
-First, I will clean up the data then run a simple correlation test to see if there's a correlation between the number of weeks a song is on the Billboard Hot 100 and how many Grammys it wins.
+Next, I will clean up the data then run a simple correlation test to see if there's a correlation between the number of weeks a song is on the Billboard Hot 100 and how many Grammy Awards it wins. I'll also do the correlation between the peak position a song on the Hot 100 reaches and how many Grammy Awards it wins.
 
 ```{r}
 BillGrammy |> filter(!is.na(`Weeks on Chart`)) |> summarize(correlation = cor(`Weeks on Chart`, Grammy, method="spearman"))
 BillGrammy |> filter(!is.na(Peak)) |> summarize(correlation = cor(Peak, Grammy, method="spearman"))
 ```
-EDIT: Based on this alone, there's clearly a very small correlation of just .051. But I still want to find out if this is a timeline-based thing. It's possible that there was a sudden drop in the correlation due to changes in policy/certain events that brought it down, so I want to check if this is a consistent trend.
+Based on this, there's pretty small correlations for both. We see .07 for the weeks on chart and -.12 for the peak rank. However, I still want to find out if this is a timeline-based thing. It's possible that there was a sudden drop in the correlation due to changes in policy/certain events that brought it down, so I want to check if this is a consistent trend.
 
 Before that, let's check if using linear models are reliable.
 
 ```{r}
 filtered_grammy <- BillGrammy |> filter(!is.na(`Weeks on Chart`), !is.na(Peak))
-lm(`Peak` ~ `Weeks on Chart`, data = filtered_grammy) |> summary()
+lm(`Grammy` ~ `Weeks on Chart`, data = filtered_grammy) |> summary()
 
 ```
-By the looks of this, I wouldn't trust this model. The residuals are around -27 and +60, meaning that the calculations could be off by that many points. While the p-value is low, the residuals are high and multiple r-squared (both normal and adjusted) is very low. 
+By the looks of this, I wouldn't trust this model. The residuals are around -39 and +1.77, meaning that the calculations could be off by that many points. There is a very high p-value and a low r-squared (even when adjusted).
 
-Next, I'll try seeing if it's possible that there's a correlation between the peak position of a song on the Hot 100 and how many Grammys it wins.
+Let's do the same for the peak.
 
 ```{r}
-lm(Peak ~ `Year Win`, data = BillGrammy) |> summary()
+lm(Peak ~ `Grammy`, data = BillGrammy) |> summary()
 ```
-We're seeing very similar results here with high residuals, low r-squared values and also a very high p-value this time. 
+We're seeing very similar results here with high residuals, low r-squared values and also a very high p-value. 
 
-Let's get a visual sense of these correlations with line charts. 
+Overall, the linear model isn't super useful in measuring these correlations. I feel like we can scrap calculating it in general.
+
+That being said, I'd like to see how these factors alone have changed over time. Compared to previous years, are Grammy-winning songs on the Billboard Hot 100 for less or more time? I'm using line charts to avoid getting distracted by the amount of variation that a scatterplot would show. 
 ```{r}
-filtered_grammy |> 
-  filter(!is.na(`Weeks on Chart`), !is.na(Peak)) |> 
-  group_by(Genre) |> 
-  summarize(
-    avg_weeks = mean(`Weeks on Chart`),
-    min_weeks = min(`Weeks on Chart`),
-    max_weeks = max(`Weeks on Chart`),
-    count = n()
-  )
 filtered_grammy |>
   ggplot(aes(x = `Year Win`, y = `Weeks on Chart`)) +
   geom_line() +
@@ -56,34 +59,35 @@ filtered_grammy |>
 ```{r}
 filtered_grammy |>
   ggplot(aes(x = `Year Win`, y = `Peak`)) +
-  geom_point() +
-  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  geom_line() +
   labs(x = "Year Win", y = "Peak",
        title = "Grammy Winners and their Peaks on Billboard over time")
 ```
-Both of these scatterplots are very horizontal and show a lot of residuals in general. Not very cohesive. It is interesting, however, how the weeks on chart correlation increased over time and how the peak decreased over time. The weeks on chart incline is also a bit more steep. 
+Both of these graphs are pretty normally distributed. There's obviously some peaks and dips in both, such as 2013 in the Weeks on Chart graph and 2006 for the Peak graph. While these are definitely interesting, they're not much help for predicting anything about the Grammys. I would have considered these timeline graphs a lot more if there was a sudden dip or peak that stayed consistent for years after. For now, it makes for a whole different project about those specific years. 
 
-TALK ABOUT GENRES
 
-Now, I want to look at the Billboard Hot 100 chart on its own and see if there's any predictions I can make between its factors. I'll once again be looking at correlations between weeks/peaks on the chart and if there's a correlation between those, as well as if said correlations have drastically changed over time. 
 
-The data tracks the charts as far back as 1958 (the start? of the charts) to 2021;
+Now, I want to look at the Billboard Hot 100 chart on its own with the same tests to see if it's any different when considering both Grammy-winning and non-Grammy-winning songs. I'll once again be looking at correlations with weeks and peaks on the chart, as well as if said correlations have drastically changed over time. 
+
+The data tracks the charts as far back as 1958, when the Billboard Hot 100 started, to 2021 (https://www.billboard.com/lists/year-end-hot-100-number-one-songs/.) I'll discuss it more later, but this already isn't great for comparing to the Grammy winners as it's a much longer timeframe. I'd still like to see what it looks like. 
 
 First, I'll load the data.
 
 ```{r}
 BillBoardHot100 <- read_csv('charts.csv')
 ```
-Next, we'll do the simple correlation tests again. I have weeks on chart, peak ranking and this time, the rank the song recieved the previous week.
+
+Next, we'll do the simple correlation tests again. I have weeks on chart, peak ranking and this time, the rank the song recieved the previous week. We'll see how these correlate with the rank a song recieves on the chart.
 
 ```{r}
-BillBoardHot100 |> summarize(correlation = cor(`weeks-on-board`, rank, method="spearman"))
-BillBoardHot100 |> summarize(correlation = cor(`peak-rank`, rank, method="spearman"))
-BillBoardHot100 |> filter(!is.na(`last-week`)) |> summarize(correlation = cor(`last-week`, rank, method="spearman"))
+weeks_and_rank <- BillBoardHot100 |> summarize(correlation = cor(`weeks-on-board`, rank, method="spearman"))
+peak_and_rank <- BillBoardHot100 |> summarize(correlation = cor(`peak-rank`, rank, method="spearman"))
+last_week_and_rank <- BillBoardHot100 |> filter(!is.na(`last-week`)) |> summarize(correlation = cor(`last-week`, rank, method="spearman"))
 ```
-It looks like there's strong correlations between the overall ranks and their previous week ranks, as well as their peak ranks. This is pretty expected, especially for the difference between the previous and current weeks. If anything, that just shows it doesn't change much between weeks. It is interesting how it's not a perfect correlation, though. I'd like to visualize how it changes over time.
 
-More importantly, however, the correlation between the weeks on board and rank are a bit lower than I thought, and also going at a negative slope. It's interesting to hear that it's decreased over time. Once again, I'd like to visualize it for that reason.
+Much higher correlations compared to same tests with the Grammy dataset. It looks like there's strong correlations between the overall ranks and their previous week ranks, as well as their peak ranks. This is pretty expected, especially for the difference between the previous and current weeks. If anything, that just shows it doesn't change much between weeks. It is interesting how it's not a perfect correlation, though. I'd like to visualize how it changes over time.
+
+More importantly, however, the correlation between the weeks on board and rank are a bit lower than I thought, and also going at a negative slope. Once again, I'd like to visualize it over time for that reason.
 
 So, let's visualize it. 
 
@@ -94,24 +98,77 @@ BillBoardHot100 |>
   labs(x = "date", y = "weeks-on-board",
        title = "How long BillBoard Hot 100 songs are on board")
 ```
-This is pretty interesting. We see a relatively steady incresse over time, but there's some random gaps here and there. That could just be because some of the data is grouped
+There's some random gaps here and there, but the data remains pretty steady and normal. That could also just be because some of the data is grouped by the same date in the column. It is  interesting to see how the data sort of goes up and down.
+
+But I found a much better observation when doing this specific test. 
+
+I accidentally wrote "date" as "rank" the first time and got this:
 
 ```{r}
 BillBoardHot100 |>
-  ggplot(aes(x = `date`, y = `peak-rank`)) +
+  ggplot(aes(x = `rank`, y = `weeks-on-board`)) +
   geom_line() +
-  labs(x = "date", y = "peak-rank",
-       title = "Peaks of BillBoard winners over time")
+  labs(x = "rank", y = "weeks-on-board",
+       title = "How long BillBoard Hot 100 songs are on board")
 ```
+There's a very sudden drop in weeks on the Billboard once a song reaches a rank of 50. If we're going to predict anything here, we can pretty surely interpret from this data that if a song is on the board for less than 50 weeks, it likely won't be ranked above 50. 
+
+But before I say anything more about that, I want to make sure that this a trustworthy model we're using here.
+
+```{r}
+lm(rank ~ `weeks-on-board`, data = BillBoardHot100) |> summary()
+```
+Like in tests we did for the Grammy/Billboard data, we see very high and low residuals, fairly low r-squared values (that doesn't change when adjusted), but this time, there's a very low p-value. Overall, this model has some questionable things, but this dip in the data with such a low p-value is definitely worth noting and lets us know something about how Billboard Hot 100 songs are ranked.
+
+There's one last thing I'd like to see; the correlation between the peak rank and weeks on board. We've already seen how it works with the general rank, but I want to see an extra measure of the role weeks on board plays, as it was pretty interesting before. Also, it can help us see how similiar or different it is to the Grammy results, since they both have peak rank as a listed factor. 
+
+More specifically, it tells us more about the BEST a song can do in the charts.
+
+I'm using scatterplots to compare the slopes.
+
 ```{r}
 BillBoardHot100 |>
-  ggplot(aes(x = `date`, y = `last-week`)) +
+  ggplot(aes(x = `peak-rank`, y = `weeks-on-board`)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE, color = "red") +
-  labs(x = "date", y = "last-week",
-       title = "Changes from previous week of BillBoard winners over time")
+  labs(x = "peak-rank", y = "weeks-on-board",
+       title = "Weeks on board vs. peak rank")
+
 ```
+```{r}
+filtered_grammy |>
+  ggplot(aes(x = `Peak`, y = `Weeks on Chart`)) +
+  geom_point() +
+   geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(x = "Peak", y = "Weeks on Chart",
+       title = "Grammy Winners and their peaks vs. weeks on chart")
+```
+Relatively steep slopes that both go downwards. Interesting.
 
-Overall, looking at these multiple regression tests and scatterplots, there's clearly not much of a change over time or a correlation in the first place. I wouldn't really consider this a newsworthy story as a result. 
+Just for one last extra measure; since I didn't do the simple correlation test between the peak rank and weeks on chart for either Grammy winners or Billboard Hot 100 songs, let's compare them side by side.
 
-before submitting: clear environment with broom then "run all"
+```{r}
+BillBoardHot100 |> summarize(correlation = cor(`weeks-on-board`, `peak-rank`, method="spearman"))
+BillGrammy |> filter(!is.na(`Weeks on Chart`)) |> summarize(correlation = cor(`Weeks on Chart`, Peak, method="spearman"))
+```
+There's relatively strong correlations within both, also both negative correlations, as we saw in the scatterplots. Let's check one last time if we can trust these linear models.
+
+```{r}
+lm(`peak-rank` ~ `weeks-on-board`, data = BillBoardHot100) |> summary()
+lm(Peak ~ `Weeks on Chart`, data = BillGrammy) |> summary()
+```
+Still relatively weird numbers like before, but low p-values for both are something to note. 
+
+FINAL PITCH:
+
+Through a series of correlation tests and visual models, we've seen how many different factors play a role in determining not just whether a song makes the Billboard Hot 100, but also if said songs win a Grammy. There aren't incredibly strong correlations between the final Billboard rank/number of Grammys a song recieves and factors like the number of weeks a song is on the charts or the peak it gets to, but both the Hot 100 and Grammy data show a much stronger correlation between the factors themselves. There was a correlation of -0.696 for the number of weeks a Billboard Hot 100 song is on the board and what rank it peaks at, and an even stronger correlation with the same factors for the Grammy data at -0.722.
+
+Though there were some errors in the linear model tests, we can interpret two things from this data:
+1) The less a song is on the charts, the lower the rank it peaks at (both calculations have strong, negative slopes.)
+2) The number of weeks a song is on the charts is better for predicting the peak of a Grammy-winning song than it is for predicting the peak of a Billboard Hot 100 song alone. 
+
+I think the story I would end up pitching with all of this is how the number of weeks a song is on a chart is relatively predictive of what rank it will peak at, further elaborating that it is a negative correlation. Also: looking at the line charts, we see a very sudden drop in the data. With further research, an addition to the story (or even the headline) could be that after a specific number of weeks on the chart, it's very unlikely that a song will peak above a specific rank. 
+
+The correlation being larger for the Grammys than it is for the Billboard Hot 100 is also interesting, but I think it's important to consider that the BillGrammy set I used tracks data from 1999-2018 while the BillboardHot100 set tracks data from 1958-2021. I'd like to get more data about Billboard Hot 100 songs that won Grammys in a larger timeline if possible to further get into that analysis. I'm also not entirely sure if that dataset includes every genre the Grammys cover, like American Roots or Children's Music. Additionally, it's honestly a bit less interesting of a story in general; people want to know what makes songs award-winning or higher on the charts and how they can predict that themselves. Other problems with both main findings of mine include the linear model test results (high residuals, low r-squareds,) so I think getting more data will also help with that if it were to be further researched.
+
+Questions: What makes a song trend on the charts longer? Can that be further analyzed by something like listener activity on different streaming services (Spotify, Apple Music, YouTube Music, etc.)? Also, what other factors Billboard or the Grammys use to pick their top songs? Do they have a stronger role in predicting winners (the answer is most likely yes, but it would be interesting to see)?
